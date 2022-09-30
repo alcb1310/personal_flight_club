@@ -14,6 +14,9 @@ class FlightSearch:
         }
         self.params = {
             "fly_from": "city:UIO",
+            "curr": "USD",
+            "nights_in_dst_from": 7,
+            "nights_in_dst_to": 28
         }
         self.data = []
 
@@ -24,7 +27,7 @@ class FlightSearch:
         response.raise_for_status()
         self.data = response.json()["data"]
 
-    def get_low_price(self, fly_to: str):
+    def get_low_price(self, fly_to: str, low_price: float):
         today = datetime.now()
         tomorrow = today + timedelta(days=1)
         final_date = tomorrow + timedelta(days=90)
@@ -33,16 +36,11 @@ class FlightSearch:
         self.params["dateFrom"]: tomorrow.strftime("%d/%m/%Y")
         self.params["dateTo"]: final_date.strftime("%d/%m/%Y")
         self.get_from_tequila_api()
-        min_value = 999999999999999999999999999999999999
+        min_value = low_price
         lowest_record = {}
         for record in self.data:
             if record["price"] < min_value:
                 min_value = record["price"]
                 lowest_record = record
 
-        print(lowest_record)
-
-
-flight = FlightSearch()
-# flight.get_from_tequila_api()
-flight.get_low_price("LTN")
+        return lowest_record
